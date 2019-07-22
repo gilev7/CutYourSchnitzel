@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Camera2Basic
 {
-    [Activity (Label = "ImageView", Icon = "@drawable/icon")]
+    [Activity (Label = "Schnitzel Time", Icon = "@drawable/icon")]
 	public class ImageActivity : Activity , View.IOnClickListener
     {
 		protected override void OnCreate (Bundle bundle)
