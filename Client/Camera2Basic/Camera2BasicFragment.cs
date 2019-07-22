@@ -201,7 +201,7 @@ namespace Camera2Basic
             base.OnCreate(savedInstanceState);
             mStateCallback = new CameraStateListener(this);
             mSurfaceTextureListener = new Camera2BasicSurfaceTextureListener(this);
-
+            
             // fill ORIENTATIONS list
             ORIENTATIONS.Append((int)SurfaceOrientation.Rotation0, 90);
             ORIENTATIONS.Append((int)SurfaceOrientation.Rotation90, 0);
@@ -311,7 +311,7 @@ namespace Camera2Basic
                         new CompareSizesByArea());
                     mImageReader = ImageReader.NewInstance(largest.Width, largest.Height, ImageFormatType.Jpeg, /*maxImages*/2);
                     mImageReader.SetOnImageAvailableListener(mOnImageAvailableListener, mBackgroundHandler);
-
+                    
                     // Find out if we need to swap dimension to get the preview size relative to sensor
                     // coordinate.
                     var displayRotation = activity.WindowManager.DefaultDisplay.Rotation;
@@ -679,12 +679,15 @@ namespace Camera2Basic
             }
         }
 
-        public void OnClick(View v)
+        public async void OnClick(View v)
         {
             if (v.Id == Resource.Id.picture)
             {
                 TakePicture();
-                Task.Delay(TimeSpan.FromSeconds(1));
+                while (mState != 4 && mState != 0)
+                {
+                    await Task.Delay(TimeSpan.FromSeconds(1));
+                }
                 m_activity.changeToImageView();
             }
             else if (v.Id == Resource.Id.info)
@@ -699,6 +702,7 @@ namespace Camera2Basic
                         .SetPositiveButton(Android.Resource.String.Ok, nullHandler)
                         .Show();
                 }
+
             }
         }
 

@@ -66,7 +66,7 @@ namespace Camera2Basic
 
         public void changeToCameraView()
         {
-            StartActivity(typeof(CameraActivity));
+            Finish();
         }
     }
 }
