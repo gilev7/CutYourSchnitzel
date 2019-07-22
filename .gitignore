@@ -9,3 +9,7 @@ packages
 Camera2Basic/obj/**/*
 Camera2Basic/bin/**/*
 *.suo
+Client/CutYourSchnitzel/obj
+Client/CutYourSchnitzel/obj/**/*
+Client/CutYourSchnitzel/.vs
+Client/CutYourSchnitzel/.vs/**/*
