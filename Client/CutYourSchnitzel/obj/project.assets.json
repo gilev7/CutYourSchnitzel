@@ -720,7 +720,7 @@
     {
       "code": "NU1107",
       "level": "Error",
-      "message": "Version conflict detected for Xamarin.Android.Support.Compat. Install/reference Xamarin.Android.Support.Compat 28.0.0.1 directly to project CutYourSchnitzel to resolve this issue. \r\n CutYourSchnitzel -> Xamarin.Essentials 1.1.0 -> Xamarin.Android.Support.Compat (>= 28.0.0.1) \r\n CutYourSchnitzel -> Xamarin.Android.Support.CustomTabs 26.1.0.1 -> Xamarin.Android.Support.Compat (= 26.1.0.1).",
+      "message": "Version conflict detected for Xamarin.Android.Support.Compat. Install/reference Xamarin.Android.Support.Compat 28.0.0.1 directly to project CutYourSchnitzel to resolve this issue. \r\n CutYourSchnitzel -> Xamarin.Essentials 1.1.0 -> Xamarin.Android.Support.Compat (>= 28.0.0.1) \r\n CutYourSchnitzel -> Xamarin.Android.Support.Design 26.1.0.1 -> Xamarin.Android.Support.Compat (= 26.1.0.1).",
       "libraryId": "Xamarin.Android.Support.Compat",
       "targetGraphs": [
         "MonoAndroid,Version=v8.0"
