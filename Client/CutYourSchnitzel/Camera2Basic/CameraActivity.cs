@@ -21,7 +21,7 @@ namespace Camera2Basic
 			if (bundle == null) {
 				FragmentManager.BeginTransaction ().Replace (Resource.Id.container, Camera2BasicFragment.NewInstance ()).Commit ();
 			}
-		}
+        }
 	}
 }
 

@@ -3,5 +3,6 @@
   <PropertyGroup>
     <SelectedDevice>galaxys</SelectedDevice>
     <DefaultDevice>galaxys</DefaultDevice>
+    <AndroidDesignerPreferredDevice>Nexus 4</AndroidDesignerPreferredDevice>
   </PropertyGroup>
 </Project>

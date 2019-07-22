@@ -2322,8 +2322,11 @@ namespace Camera2Basic
 			// aapt resource value: 0x7F030003
 			public const int activity_main = 2130903043;
 			
+			// aapt resource value: 0x7F030005
+			public const int fragment_camera2_basic = 2130903045;
+			
 			// aapt resource value: 0x7F030004
-			public const int fragment_camera2_basic = 2130903044;
+			public const int fragment_camera2_basic - Copy = 2130903044;
 			
 			// aapt resource value: 0x7F0F0001
 			public const int notification_action = 2131689473;

@@ -677,6 +677,9 @@ namespace Camera2Basic
             if (v.Id == Resource.Id.picture)
             {
                 TakePicture();
+
+                var imageView = FindViewById<ImageView>(Resource.Id.demoImageView);
+                imageView.SetImageResource(Resource.Drawable.image2);
             }
             else if (v.Id == Resource.Id.info)
             {
@@ -686,7 +689,7 @@ namespace Camera2Basic
                 if (activity != null)
                 {
                     new AlertDialog.Builder(activity)
-                        .SetMessage("This sample demonstrates the basic use of the Camera2 API. ...")
+                        .SetMessage("This is the best Schnitzel app ever.")
                         .SetPositiveButton(Android.Resource.String.Ok, nullHandler)
                         .Show();
                 }
