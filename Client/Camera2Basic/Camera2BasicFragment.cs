@@ -22,6 +22,7 @@ using Java.Util.Concurrent;
 using Boolean = Java.Lang.Boolean;
 using Math = Java.Lang.Math;
 using Orientation = Android.Content.Res.Orientation;
+using System.Threading.Tasks;
 
 namespace Camera2Basic
 {
@@ -184,9 +185,15 @@ namespace Camera2Basic
             }
         }
 
-        public static Camera2BasicFragment NewInstance()
+        public static Camera2BasicFragment NewInstance(CameraActivity cameraActivity)
         {
-            return new Camera2BasicFragment();
+            return new Camera2BasicFragment(cameraActivity);
+        }
+
+        private CameraActivity m_activity;
+        public Camera2BasicFragment(CameraActivity cameraActivity)
+        {
+            m_activity = cameraActivity;
         }
 
         public override void OnCreate(Bundle savedInstanceState)
@@ -677,6 +684,8 @@ namespace Camera2Basic
             if (v.Id == Resource.Id.picture)
             {
                 TakePicture();
+                Task.Delay(TimeSpan.FromSeconds(1));
+                m_activity.changeToImageView();
             }
             else if (v.Id == Resource.Id.info)
             {
