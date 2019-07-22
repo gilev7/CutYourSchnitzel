@@ -1,9 +1,0 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <PropertyGroup>
-    <SelectedDevice>galaxys</SelectedDevice>
-    <DefaultDevice>galaxys</DefaultDevice>
-    <AndroidDesignerPreferredTheme>AppTheme</AndroidDesignerPreferredTheme>
-    <AndroidDesignerPreferredDevice>10.1in WXGA %28Tablet%29</AndroidDesignerPreferredDevice>
-  </PropertyGroup>
-</Project>
