@@ -5,7 +5,7 @@ _ReSharper.*
 bin
 obj
 packages
-.vs
+.vs/**/*
 Camera2Basic/obj/**/*
 Camera2Basic/bin/**/*
 *.suo
