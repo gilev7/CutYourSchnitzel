@@ -1,13 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Emgu.CV;
+﻿using Emgu.CV;
 using Emgu.CV.CvEnum;
 using Emgu.CV.Structure;
 using Emgu.CV.Util;
+using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Linq;
+using System.Runtime.InteropServices;
 
 namespace CutSchnitzelAlgo
 {
@@ -105,7 +104,7 @@ namespace CutSchnitzelAlgo
             var color = new MCvScalar(0, 255, 0);
             CvInvoke.Line(mat, new Point(minCol, cuttingRow), new Point(maxCol, cuttingRow), color, 10);
             var newImage = mat.ToImage<Rgb, Byte>();
-            var fileName = Guid.NewGuid() + ".png";
+            var fileName = "/storage/emulated/0/Android/data/Camera2Basic.Camera2Basic/files/pic.jpg";
             newImage.ToBitmap().Save(fileName);
             return fileName;
         }

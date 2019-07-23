@@ -5,6 +5,8 @@ using Android.Widget;
 using System;
 using System.IO;
 using System.Net;
+using CutSchnitzelAlgo;
+using Java.IO;
 
 namespace Camera2Basic
 {
@@ -53,36 +55,34 @@ namespace Camera2Basic
 
         public void ChangeToImageView()
         {
-            //SendLocalMediaToDatabase();
+            SendLocalMediaToDatabase();
             //var percent = m_Seekbar.Progress;
+            //HandlePicture();
             StartActivity(typeof(ImageActivity));
         }
 
-        private bool SendLocalMediaToDatabase()
+        private async void SendLocalMediaToDatabase()
         {
             var filepath = "/storage/emulated/0/Android/data/Camera2Basic.Camera2Basic/files/pic.jpg";
-            var url = "http://10.93.58.44:5000/";
-            byte[] file = File.ReadAllBytes(filepath);
+            var url = "https://cutyourschnitzel.azurewebsites.net/";
             var webClient = new WebClientEx();
             var boundary = "------------------------" + DateTime.Now.Ticks.ToString("x");
             webClient.Headers.Add("Content-Type", "application/form-data; boundary=" + boundary);
-            var contentType = "img/jpeg";
-            var fileData = webClient.Encoding.GetString(file);
-            var fileName = Path.GetFileNameWithoutExtension(filepath);
-            var package = string.Format("--{0}\r\nContent-Disposition: form-data; name=\"file\"; filename=\"{1}\"\r\nContent-Type: {2}\r\n\r\n{3}\r\n--{0}--\r\n", boundary, fileName, contentType, fileData);
-            var nfile = webClient.Encoding.GetBytes(package);
 
             webClient.Timeout = 900000;
 
-            byte[] resp = webClient.UploadData(url, "POST", nfile);
+            byte[] resp = await webClient.UploadFileTaskAsync(url, filepath);
 
-
-            return true;
+            using (var fileOutputStream = new FileOutputStream(filepath))
+            {
+                await fileOutputStream.WriteAsync(resp);
+            }
         }
 
         public void HandlePicture()
         {
-
+            var filepath = "/storage/emulated/0/Android/data/Camera2Basic.Camera2Basic/files/pic.jpg";
+            SchnitzelCutter.CutSchnitzelImage(filepath);
         }
     }
 
