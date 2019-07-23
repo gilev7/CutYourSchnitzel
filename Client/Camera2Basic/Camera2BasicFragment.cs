@@ -185,15 +185,9 @@ namespace Camera2Basic
             }
         }
 
-        public static Camera2BasicFragment NewInstance(CameraActivity cameraActivity)
+        public static Camera2BasicFragment NewInstance()
         {
-            return new Camera2BasicFragment(cameraActivity);
-        }
-
-        private CameraActivity m_activity;
-        public Camera2BasicFragment(CameraActivity cameraActivity)
-        {
-            m_activity = cameraActivity;
+            return new Camera2BasicFragment();
         }
 
         public override void OnCreate(Bundle savedInstanceState)
@@ -219,7 +213,7 @@ namespace Camera2Basic
             mTextureView = (AutoFitTextureView)view.FindViewById(Resource.Id.texture);
             view.FindViewById(Resource.Id.picture).SetOnClickListener(this);
             view.FindViewById(Resource.Id.info).SetOnClickListener(this);
-            m_activity.SetSeekbar();
+            SingletonConnector.cameraActivity.SetSeekbar();
         }
 
         public override void OnActivityCreated(Bundle savedInstanceState)
@@ -689,7 +683,7 @@ namespace Camera2Basic
                 {
                     await Task.Delay(TimeSpan.FromSeconds(0.5));
                 }
-                m_activity.ChangeToImageView();
+                SingletonConnector.cameraActivity.ChangeToImageView();
             }
             else if (v.Id == Resource.Id.info)
             {
