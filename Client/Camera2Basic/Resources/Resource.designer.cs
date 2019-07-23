@@ -2059,8 +2059,8 @@ namespace Camera2Basic
 			// aapt resource value: 0x7f0a003a
 			public const int image = 2131361850;
 			
-			// aapt resource value: 0x7f0a0069
-			public const int info = 2131361897;
+			// aapt resource value: 0x7f0a006b
+			public const int info = 2131361899;
 			
 			// aapt resource value: 0x7f0a0034
 			public const int italic = 2131361844;
@@ -2110,8 +2110,8 @@ namespace Camera2Basic
 			// aapt resource value: 0x7f0a0040
 			public const int parentPanel = 2131361856;
 			
-			// aapt resource value: 0x7f0a0068
-			public const int picture = 2131361896;
+			// aapt resource value: 0x7f0a006a
+			public const int picture = 2131361898;
 			
 			// aapt resource value: 0x7f0a006c
 			public const int pictureTaken = 2131361900;
@@ -2173,8 +2173,8 @@ namespace Camera2Basic
 			// aapt resource value: 0x7f0a0064
 			public const int search_voice_btn = 2131361892;
 			
-			// aapt resource value: 0x7f0a006a
-			public const int seekBarId = 2131361898;
+			// aapt resource value: 0x7f0a0068
+			public const int seekBarId = 2131361896;
 			
 			// aapt resource value: 0x7f0a0065
 			public const int select_dialog_listview = 2131361893;
@@ -2227,8 +2227,8 @@ namespace Camera2Basic
 			// aapt resource value: 0x7f0a000d
 			public const int text2 = 2131361805;
 			
-			// aapt resource value: 0x7f0a006b
-			public const int textSeekBarView = 2131361899;
+			// aapt resource value: 0x7f0a0069
+			public const int textSeekBarView = 2131361897;
 			
 			// aapt resource value: 0x7f0a0045
 			public const int textSpacerNoButtons = 2131361861;

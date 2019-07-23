@@ -15,9 +15,23 @@
         android:layout_alignParentStart="true"
         android:layout_above="@id/texture"
         android:background="#FF8C00">
+        <SeekBar
+            android:layout_width="170sp"
+            android:layout_height="match_parent"
+            android:id="@+id/seekBarId"
+            android:layout_gravity="center_vertical|left" />
+        <TextView
+            android:text="Schnitzel Cut Percent is 0%"
+            android:layout_width="match_parent"
+            android:layout_height="15dp"
+            android:textStyle="bold"
+            android:textSize="14dp"
+            android:textColor="#FFFFFF"
+            android:id="@+id/textSeekBarView" />
         <Button
             android:id="@+id/picture"
-            android:layout_width="wrap_content"
+            android:layout_width="200sp"
+            android:layout_marginLeft="80sp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:text="@string/picture" />
@@ -30,18 +44,5 @@
             android:layout_gravity="center_vertical|right"
             android:padding="20dp"
             android:src="@drawable/ic_action_info" />
-        <SeekBar
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/seekBarId"
-            android:layout_gravity="center_vertical|left" />
-        <TextView
-            android:text="Schnitzel Cut Percent is 0%"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:textStyle="bold"
-            android:textSize="20dp"
-            android:textColor="#FFFFFF"
-            android:id="@+id/textSeekBarView" />
     </FrameLayout>
 </RelativeLayout>
