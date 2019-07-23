@@ -2228,7 +2228,7 @@ namespace Camera2Basic
 			public const int text2 = 2131361805;
 			
 			// aapt resource value: 0x7f0a006b
-			public const int textSeekBar = 2131361899;
+			public const int textSeekBarView = 2131361899;
 			
 			// aapt resource value: 0x7f0a0045
 			public const int textSpacerNoButtons = 2131361861;
