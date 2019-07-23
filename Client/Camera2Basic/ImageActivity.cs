@@ -4,7 +4,6 @@ using Android.OS;
 using Android.Views;
 using Android.Widget;
 using System;
-using System.Threading.Tasks;
 
 namespace Camera2Basic
 {

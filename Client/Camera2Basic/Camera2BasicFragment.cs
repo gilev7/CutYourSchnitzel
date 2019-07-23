@@ -1,28 +1,28 @@
-﻿using System;
-using System.Collections.Generic;
-using Android;
+﻿using Android;
 using Android.App;
 using Android.Content;
 using Android.Content.PM;
+using Android.Graphics;
+using Android.Hardware.Camera2;
+using Android.Hardware.Camera2.Params;
+using Android.Media;
 using Android.OS;
+using Android.Support.V13.App;
+using Android.Support.V4.Content;
 using Android.Util;
 using Android.Views;
 using Android.Widget;
-using Android.Hardware.Camera2;
-using Android.Graphics;
-using Android.Hardware.Camera2.Params;
-using Android.Media;
-using Android.Support.V13.App;
-using Android.Support.V4.Content;
 using Camera2Basic.Listeners;
 using Java.IO;
 using Java.Lang;
 using Java.Util;
 using Java.Util.Concurrent;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Boolean = Java.Lang.Boolean;
 using Math = Java.Lang.Math;
 using Orientation = Android.Content.Res.Orientation;
-using System.Threading.Tasks;
 
 namespace Camera2Basic
 {
@@ -686,7 +686,7 @@ namespace Camera2Basic
                 TakePicture();
                 while (mState != 4 && mState != 0)
                 {
-                    await Task.Delay(TimeSpan.FromSeconds(1));
+                    await Task.Delay(TimeSpan.FromSeconds(0.5));
                 }
                 m_activity.changeToImageView();
             }
