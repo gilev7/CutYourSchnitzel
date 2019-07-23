@@ -53,6 +53,7 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <AndroidLinkMode>SdkOnly</AndroidLinkMode>
+    <AndroidCreatePackagePerAbi>false</AndroidCreatePackagePerAbi>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
     <OutputPath>bin\x86\Release\</OutputPath>
@@ -64,13 +65,26 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Emgu.CV.UI">
+      <HintPath>..\packages\EMGU.CV.4.1.0.3420\lib\net35\Emgu.CV.UI.dll</HintPath>
+      <Aliases>global</Aliases>
+    </Reference>
+    <Reference Include="Emgu.CV.World">
+      <HintPath>..\packages\EMGU.CV.4.1.0.3420\lib\net35\Emgu.CV.World.dll</HintPath>
+      <Aliases>global</Aliases>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Drawing">
-      <HintPath>..\..\..\..\..\Windows\Microsoft.NET\Framework\v4.0.30319\System.Drawing.dll</HintPath>
+      <HintPath>..\..\..\..\..\Windows\Microsoft.NET\Framework64\v4.0.30319\System.Drawing.dll</HintPath>
+      <Aliases>draw</Aliases>
     </Reference>
-    <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
     <Reference Include="Mono.Android" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.XML.2.0.0.0">
+      <HintPath>..\..\System.XML.2.0.0.0.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml.Linq" />
     <Reference Include="Xamarin.Android.Arch.Core.Common, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\packages\Xamarin.Android.Arch.Core.Common.1.0.0\lib\MonoAndroid80\Xamarin.Android.Arch.Core.Common.dll</HintPath>
       <Private>True</Private>
@@ -131,6 +145,9 @@
       <HintPath>..\packages\Xamarin.Android.Support.Vector.Drawable.27.0.2\lib\MonoAndroid81\Xamarin.Android.Support.Vector.Drawable.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="ZedGraph">
+      <HintPath>..\packages\ZedGraph.5.1.7\lib\net35-Client\ZedGraph.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ImageActivity.cs" />
@@ -148,6 +165,7 @@
     <Compile Include="CameraActivity.cs" />
     <Compile Include="Camera2BasicFragment.cs" />
     <Compile Include="AutoFitTextureView.cs" />
+    <Compile Include="Cutter.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
@@ -186,30 +204,6 @@
     <AndroidResource Include="Resources\layout\image_view.axml">
       <SubType>Designer</SubType>
     </AndroidResource>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\CutSchnitzelAlgo\CutSchnitzelAlgo.csproj">
-      <Project>{563138d2-a0b3-497c-b5e6-bebc000243d6}</Project>
-      <Name>CutSchnitzelAlgo</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <AndroidNativeLibrary Include="concrt140.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </AndroidNativeLibrary>
-    <AndroidNativeLibrary Include="cvextern.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </AndroidNativeLibrary>
-    <Content Include="License-LGPL.txt" />
-    <AndroidNativeLibrary Include="msvcp140.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </AndroidNativeLibrary>
-    <AndroidNativeLibrary Include="opencv_ffmpeg410.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </AndroidNativeLibrary>
-    <AndroidNativeLibrary Include="vcruntime140.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </AndroidNativeLibrary>
   </ItemGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

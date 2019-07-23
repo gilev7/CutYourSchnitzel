@@ -12,8 +12,12 @@ namespace CutSchnitzelAlgo
 {
     public static class SchnitzelCutter
     {
-        public static void CutSchnitzelImage(string path, IEnumerable<Tuple<string, double>> input = null)
+        ///storage/emulated/0/Android/data/Camera2Basic.Camera2Basic/files/
+        //[DllImport("cvextern.dll", CharSet = CharSet.Unicode)]
+        //public static extern Mat Imread(string path, ImreadModes mode);
+        public static void CutSchnitzelImage(string folderPath, IEnumerable<Tuple<string, double>> input = null)
         {
+            var path = folderPath + "pic.jpg";
             try
             {
                 var mat = CvInvoke.Imread(path, ImreadModes.AnyColor);

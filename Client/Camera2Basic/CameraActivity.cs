@@ -1,12 +1,9 @@
-﻿using Android;
-using Android.App;
+﻿using Android.App;
 using Android.OS;
 using Android.Widget;
-using System;
-using System.IO;
-using System.Net;
-using CutSchnitzelAlgo;
 using Java.IO;
+using System;
+using System.Net;
 
 namespace Camera2Basic
 {
@@ -55,9 +52,9 @@ namespace Camera2Basic
 
         public void ChangeToImageView()
         {
-            SendLocalMediaToDatabase();
+            //SendLocalMediaToDatabase();
             //var percent = m_Seekbar.Progress;
-            //HandlePicture();
+            HandlePicture();
             StartActivity(typeof(ImageActivity));
         }
 
@@ -81,8 +78,8 @@ namespace Camera2Basic
 
         public void HandlePicture()
         {
-            var filepath = "/storage/emulated/0/Android/data/Camera2Basic.Camera2Basic/files/pic.jpg";
-            SchnitzelCutter.CutSchnitzelImage(filepath);
+            var filepath = "/storage/emulated/0/Android/data/Camera2Basic.Camera2Basic/files/";
+            Cutter.CutSchnitzelImage(filepath);
         }
     }
 
