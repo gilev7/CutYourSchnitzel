@@ -1,5 +1,6 @@
 import numpy as np
 import cv2
+import logging
 
 
 def binary_search_y(mask):
@@ -29,15 +30,24 @@ def convert_input(image_str):
     img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
     return img
 
+def resize_image(image):
+    scale_percent = 20 # percent of original size
+    width = int(image.shape[1] * scale_percent / 100)
+    height = int(image.shape[0] * scale_percent / 100)
+    dim = (width, height)
+    # resize image
+    resized = cv2.resize(image, dim, interpolation = cv2.INTER_AREA)
+    return resized
+
 
 def cut_image(request):
     #image = cv2.imread(image_name, 3Z
-    image = convert_input(request.data)
-    image = cv2.cvtColor(np.array(image), cv2.COLOR_BGR2RGB)
-    blurred_frame = cv2.GaussianBlur(image, (7, 7), 0)
-    hsv = cv2.cvtColor(blurred_frame, cv2.COLOR_RGB2HSV)
-    golden_yellow = np.array([10, 125, 75])
-    golden_brown = np.array([15, 255, 255])
+    image = convert_input(request.files['file'].stream.read())
+    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+    image = resize_image(image)
+    hsv = cv2.cvtColor(image, cv2.COLOR_RGB2HSV)
+    golden_yellow = np.array([5, 125, 75])
+    golden_brown = np.array([20, 255, 255])
     mask = cv2.inRange(hsv, golden_yellow, golden_brown)
     contours ,_ = cv2.findContours(mask, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
     areas = []
@@ -56,5 +66,6 @@ def cut_image(request):
     else:
         coord1, coord2 = ((int(middle), min_), (int(middle), max_))
     cv2.line(image, coord1, coord2, (0, 0, 255), 2)
+    image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
     _, image_encoded = cv2.imencode('.jpg', image)
     return image_encoded.tostring()
