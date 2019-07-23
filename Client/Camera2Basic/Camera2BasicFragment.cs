@@ -219,6 +219,7 @@ namespace Camera2Basic
             mTextureView = (AutoFitTextureView)view.FindViewById(Resource.Id.texture);
             view.FindViewById(Resource.Id.picture).SetOnClickListener(this);
             view.FindViewById(Resource.Id.info).SetOnClickListener(this);
+            m_activity.SetSeekbar();
         }
 
         public override void OnActivityCreated(Bundle savedInstanceState)

@@ -36,9 +36,12 @@
             android:id="@+id/seekBarId"
             android:layout_gravity="center_vertical|left" />
         <TextView
-            android:text="Text"
+            android:text="Schnitzel Cut Percent is 0%"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:id="@+id/textSeekBar" />
+            android:textStyle="bold"
+            android:textSize="20dp"
+            android:textColor="#FFFFFF"
+            android:id="@+id/textSeekBarView" />
     </FrameLayout>
 </RelativeLayout>
