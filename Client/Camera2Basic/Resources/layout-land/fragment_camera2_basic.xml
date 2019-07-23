@@ -17,9 +17,21 @@
         android:layout_alignParentTop="true"
         android:layout_below="@id/texture"
         android:layout_toRightOf="@id/texture"
-        android:background="#4285f4"
+        android:background="#FF8C00"
         android:orientation="horizontal">
-        <Button
+        <SeekBar
+            android:layout_width="match_parent"
+            android:layout_height="20sp"
+            android:paddingVertical="50dp"
+            android:layout_gravity="center_horizontal|top"
+            android:id="@+id/seekBarId" />
+        <TextView
+          android:text="Text"
+          android:layout_width="match_parent"
+          android:layout_height="20sp"
+          android:paddingVertical="15dp"
+          android:id="@+id/textSeekBar" />
+         <Button
             android:id="@+id/picture"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

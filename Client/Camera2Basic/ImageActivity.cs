@@ -15,21 +15,9 @@ namespace Camera2Basic
 			base.OnCreate (bundle);
             initializeView();
         }
-        protected override void OnStart()
-        {
-            base.OnStart();
-            initializeView();
-        }
-
-        protected override void OnResume()
-        {
-            base.OnResume();
-            initializeView();
-        }
 
         public void initializeView()
         {
-            
             ActionBar.Hide();
             SetContentView(Resource.Layout.image_view);
 
@@ -57,7 +45,7 @@ namespace Camera2Basic
                 EventHandler<DialogClickEventArgs> nullHandler = null;
 
                 new AlertDialog.Builder(this)
-                    .SetMessage("This sample demonstrates the basic use of the Camera2 API. ...")
+                    .SetMessage("This function is not supported.")
                     .SetPositiveButton(Android.Resource.String.Ok, nullHandler)
                     .Show();
             }

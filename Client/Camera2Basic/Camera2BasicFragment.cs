@@ -688,7 +688,7 @@ namespace Camera2Basic
                 {
                     await Task.Delay(TimeSpan.FromSeconds(0.5));
                 }
-                m_activity.changeToImageView();
+                m_activity.ChangeToImageView();
             }
             else if (v.Id == Resource.Id.info)
             {
@@ -698,7 +698,7 @@ namespace Camera2Basic
                 if (activity != null)
                 {
                     new AlertDialog.Builder(activity)
-                        .SetMessage("This sample demonstrates the basic use of the Camera2 API. ...")
+                        .SetMessage("This is the best Schnitzel app ever.")
                         .SetPositiveButton(Android.Resource.String.Ok, nullHandler)
                         .Show();
                 }

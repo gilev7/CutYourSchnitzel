@@ -1,13 +1,14 @@
 ﻿
 using Android.App;
 using Android.OS;
+using Android.Widget;
 
 namespace Camera2Basic
 {
-    [Activity (Label = "Camera2Basic", MainLauncher = true, Icon = "@drawable/icon")]
+    [Activity (Label = "CutYourSchnitzel", MainLauncher = true, Icon = "@drawable/icon")]
 	public class CameraActivity : Activity
 	{
-        
+        private SeekBar m_Seekbar;
         protected override void OnResume()
         {
             base.OnResume();
@@ -24,14 +25,29 @@ namespace Camera2Basic
 			ActionBar.Hide ();
 			SetContentView (Resource.Layout.activity_camera);
 
-			if (bundle == null) {
+            m_Seekbar = FindViewById<SeekBar>(Resource.Id.seekBarId);
+            //var textView = FindViewById<TextView>(Resource.Id.textSeekBar);
+            //m_Seekbar.ProgressChanged += (object sender, SeekBar.ProgressChangedEventArgs e) => {
+            //    if (e.FromUser)
+            //    {
+            //textView.Text = string.Format("Schnitzel Cut Percent is {0}", e.Progress);
+            //}
+            //};
+
+            if (bundle == null) {
 				FragmentManager.BeginTransaction ().Replace (Resource.Id.container, Camera2BasicFragment.NewInstance (this)).Commit ();
 			}
         }
 
-        public void changeToImageView()
+        public void ChangeToImageView()
         {
+            //var percent = m_Seekbar.Progress;
             StartActivity(typeof(ImageActivity));
+        }
+
+        public void HandlePicture()
+        {
+
         }
     }
 }
