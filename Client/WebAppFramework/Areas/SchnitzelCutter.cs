@@ -5,6 +5,7 @@ using Emgu.CV.Util;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -13,12 +14,11 @@ namespace CutSchnitzelAlgo
 {
     public static class SchnitzelCutter
     {
-        ///storage/emulated/0/Android/data/Camera2Basic.Camera2Basic/files/
-        //[DllImport("cvextern.dll", CharSet = CharSet.Unicode)]
-        //public static extern Mat Imread(string path, ImreadModes mode);
-        public static void CutSchnitzelImage(string folderPath, IEnumerable<Tuple<string, double>> input = null)
+        public static byte[] CutSchnitzelImage(byte[] buf, IEnumerable<Tuple<string, double>> input = null)
         {
-            var path = folderPath + "pic.jpg";
+
+            var path = "pic.jpg";
+            File.WriteAllBytes(path, buf);
             try
             {
                 var mat = CvInvoke.Imread(path, ImreadModes.AnyColor);
@@ -45,8 +45,7 @@ namespace CutSchnitzelAlgo
                         }
 
                         var color = new MCvScalar(255, 0, 0);
-                        var biggestContours = arrayList.OrderByDescending(x => x.Area)?.Take(2);
-                        var biggestContour = biggestContours.FirstOrDefault();
+                        var biggestContour = arrayList.OrderByDescending(x => x.Area).FirstOrDefault();
 
                         if (biggestContour == null || biggestContour.Area < 100000)
                         {
@@ -62,52 +61,15 @@ namespace CutSchnitzelAlgo
                                new Rgb(0, 0, 255).MCvScalar, 3, LineType.Filled);
 
                             var newImage = thisIsNotSchnitzelMat.ToImage<Rgb, Byte>();
-                            var fileName = @"c:\temp\thisIsNotSchnizel.png";
-                            newImage.ToBitmap().Save(fileName);
-                            return;
+                            //var fileName = @"c:\temp\thisIsNotSchnizel.png";
+                            //newImage.ToBitmap().Save(fileName);
+                            return newImage.ToJpegData();
                         }
-
 
                         var mask = Mat.Zeros(imageHsvDest.Rows, imageHsvDest.Cols, DepthType.Cv8U, 3);
-                        if (biggestContours.Count() == 2 && biggestContours.Last().Area * 10 > biggestContour.Area)
-                        {
-                            var secondContour = biggestContours.Last();
-                            var imageDivided = CvInvoke.Imread(path, ImreadModes.AnyColor);
-                            CvInvoke.CvtColor(imageDivided, imageDivided, ColorConversion.Bgr2Rgb);
-                            var biggestContourArea = (int)(biggestContour.Area / (biggestContour.Area + secondContour.Area) * 100);
-                            var secondContourArea = 100 - biggestContourArea;
-                            var biggestContourM = CvInvoke.Moments(biggestContour.Contour);
-                            var biggestContourX = (int)(biggestContourM.M10 / biggestContourM.M00);
-                            var biggestContourY = (int)(biggestContourM.M01 / biggestContourM.M00);
-                            var secondContourM = CvInvoke.Moments(secondContour.Contour);
-                            var secondContourX = (int)(secondContourM.M10 / secondContourM.M00);
-                            var secondContourY = (int)(secondContourM.M01 / secondContourM.M00);
-                            CvInvoke.PutText(
-                                imageDivided,
-                                biggestContourArea.ToString() + "%",
-                                new System.Drawing.Point(biggestContourX, biggestContourY),
-                                FontFace.HersheyPlain,
-                                2.0,
-                                new Rgb(0, 0, 255).MCvScalar, 3, LineType.Filled);
-                            CvInvoke.PutText(
-                                imageDivided,
-                                secondContourArea.ToString() + "%",
-                                new System.Drawing.Point(secondContourX, secondContourY),
-                                FontFace.HersheyPlain,
-                                2.0,
-                                new Rgb(0, 0, 255).MCvScalar, 3, LineType.Filled);
-                            var newImage = imageDivided.ToImage<Rgb, Byte>();
-                            var fileName = @"c:\temp\imageDivided.png";
-                            newImage.ToBitmap().Save(fileName);
-                            return;
-                        }
-                        else
-                        {
-                            CvInvoke.DrawContours(mask, biggestContour.Contour, 0, color, -1);
-                        }
-
+                        CvInvoke.DrawContours(mask, new VectorOfVectorOfPoint(biggestContour.Contour), 0, color, -1);
                         var newPicPath = SchnitzelCutter.DividePicture(path, mask, biggestContour.Area, input.ToList());
-                        //return newPicPath;
+                        return newPicPath;
                     }
                     catch (Exception e)
                     {
@@ -125,9 +87,11 @@ namespace CutSchnitzelAlgo
             {
                 // do nothing
             }
+
+            return buf;
         }
 
-        private static string DividePicture(string path, Mat mask, double area, List<Tuple<string, double>> input)
+        private static byte[] DividePicture(string path, Mat mask, double area, List<Tuple<string, double>> input)
         {
             if (input == null)
             {
@@ -194,9 +158,9 @@ namespace CutSchnitzelAlgo
             }
             
             var newImage = mat.ToImage<Rgb, Byte>();
-            var fileName = "/storage/emulated/0/Android/data/Camera2Basic.Camera2Basic/files/pic.jpg";
-            newImage.ToBitmap().Save(fileName);
-             return fileName;
+            //var fileName = "/storage/emulated/0/Android/data/Camera2Basic.Camera2Basic/files/pic.jpg";
+            //newImage.ToBitmap().Save(fileName);
+             return newImage.ToJpegData();
         }
     }
 
