@@ -41,7 +41,8 @@ namespace CutSchnitzelAlgo
                         }
 
                         var color = new MCvScalar(255, 0, 0);
-                        var biggestContour = arrayList.OrderByDescending(x => x.Area).FirstOrDefault();
+                        var biggestContours = arrayList.OrderByDescending(x => x.Area)?.Take(2);
+                        var biggestContour = biggestContours.FirstOrDefault();
 
                         if (biggestContour == null || biggestContour.Area < 100000)
                         {
@@ -62,8 +63,45 @@ namespace CutSchnitzelAlgo
                             return;
                         }
 
+
                         var mask = Mat.Zeros(imageHsvDest.Rows, imageHsvDest.Cols, DepthType.Cv8U, 3);
-                        CvInvoke.DrawContours(mask, new VectorOfVectorOfPoint(biggestContour.Contour), 0, color, -1);
+                        if (biggestContours.Count() == 2 && biggestContours.Last().Area * 10 > biggestContour.Area)
+                        {
+                            var secondContour = biggestContours.Last();
+                            var imageDivided = CvInvoke.Imread(path, ImreadModes.AnyColor);
+                            CvInvoke.CvtColor(imageDivided, imageDivided, ColorConversion.Bgr2Rgb);
+                            var biggestContourArea = (int)(biggestContour.Area / (biggestContour.Area + secondContour.Area) * 100);
+                            var secondContourArea = 100 - biggestContourArea;
+                            var biggestContourM = CvInvoke.Moments(biggestContour.Contour);
+                            var biggestContourX = (int)(biggestContourM.M10 / biggestContourM.M00);
+                            var biggestContourY = (int)(biggestContourM.M01 / biggestContourM.M00);
+                            var secondContourM = CvInvoke.Moments(secondContour.Contour);
+                            var secondContourX = (int)(secondContourM.M10 / secondContourM.M00);
+                            var secondContourY = (int)(secondContourM.M01 / secondContourM.M00);
+                            CvInvoke.PutText(
+                                imageDivided,
+                                biggestContourArea.ToString() + "%",
+                                new System.Drawing.Point(biggestContourX, biggestContourY),
+                                FontFace.HersheyPlain,
+                                2.0,
+                                new Rgb(0, 0, 255).MCvScalar, 3, LineType.Filled);
+                            CvInvoke.PutText(
+                                imageDivided,
+                                secondContourArea.ToString() + "%",
+                                new System.Drawing.Point(secondContourX, secondContourY),
+                                FontFace.HersheyPlain,
+                                2.0,
+                                new Rgb(0, 0, 255).MCvScalar, 3, LineType.Filled);
+                            var newImage = imageDivided.ToImage<Rgb, Byte>();
+                            var fileName = @"c:\temp\imageDivided.png";
+                            newImage.ToBitmap().Save(fileName);
+                            return;
+                        }
+                        else
+                        {
+                            CvInvoke.DrawContours(mask, biggestContour.Contour, 0, color, -1);
+                        }
+
                         var newPicPath = SchnitzelCutter.DividePicture(path, mask, biggestContour.Area, input.ToList());
                         //return newPicPath;
                     }
