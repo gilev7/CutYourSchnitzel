@@ -23,7 +23,7 @@ namespace CutSchnitzelAlgo
                 var mat = CvInvoke.Imread(path, ImreadModes.AnyColor);
                 CvInvoke.CvtColor(mat, mat, ColorConversion.Bgr2Rgb);
                 CvInvoke.CvtColor(mat, mat, ColorConversion.Rgb2Hsv);
-                Image<Bgr, Byte> image = mat.ToImage<Bgr, Byte>();
+                Image<Hsv, Byte> image = mat.ToImage<Hsv, Byte>();
                 using (Image<Hsv, Byte> hsv = image.Convert<Hsv, Byte>())
                 {
                     Image<Gray, Byte>[] channels = hsv.Split();
@@ -53,8 +53,12 @@ namespace CutSchnitzelAlgo
 
                         var mask = Mat.Zeros(imageHsvDest.Rows, imageHsvDest.Cols, DepthType.Cv8U, 3);
                         CvInvoke.DrawContours(mask, new VectorOfVectorOfPoint(biggestContour.Contour), 0, color, -1);
-                        var newPicPath = DividePicture(path, mask, biggestContour.Area, input);
+                        var newPicPath = SchnitzelCutter.DividePicture(path, mask, biggestContour.Area, input.ToList());
                         //return newPicPath;
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e.Message);
                     }
                     finally
                     {
@@ -64,60 +68,82 @@ namespace CutSchnitzelAlgo
                     }
                 }
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 // do nothing
             }
         }
 
-        private static string DividePicture(string path, Mat mask, double area, IEnumerable<Tuple<string, double>> input)
+        private static string DividePicture(string path, Mat mask, double area, List<Tuple<string, double>> input)
         {
+            if (input == null)
+            {
+                input = new List<Tuple<string, double>>()
+                {
+                    new Tuple<string, double>(string.Empty, 0.5),
+                    new Tuple<string, double>(string.Empty, 0.5),
+                };
+            }
+
             var mat = CvInvoke.Imread(path, ImreadModes.AnyColor);
             CvInvoke.CvtColor(mat, mat, ColorConversion.Bgr2Rgb);
             Image<Hsv, Byte> image = mask.ToImage<Hsv, Byte>();
             var points = image.Data;
             int sum = 0;
-            int cuttingRow = 0;
-            int minCol = 0;
-            int maxCol = 0;
-            for (int row = 0; row < image.Rows; row++)
+            int cuttingX = 0;
+            double requiredAreaPart = 0;
+            var lines = new List<Tuple<string, Point, Point>>();
+            input.RemoveAt(input.Count() - 1);
+            foreach (var pair in input)
             {
-                for (int col = 0; col < image.Cols; col++)
+                requiredAreaPart += pair.Item2;
+                for (int x = 0; x < image.Rows; x++)
                 {
-                    if (points[row, col, 0] > 0 || points[row, col, 1] > 0 || points[row, col, 2] > 0)
+                    int minY = 0;
+                    int maxY = 0;
+
+                    for (int y = 0; y < image.Cols; y++)
                     {
-                        if (minCol == 0 || col < minCol)
-                        {
-                            minCol = col;
-                        }
 
-                        if (col > maxCol)
+                        if (points[x, y, 0] > 0 || points[x, y, 1] > 0 || points[x, y, 2] > 0)
                         {
-                            maxCol = col;
-                        }
-                        if (sum++ > (int)area / 2)
-                        {
-                            cuttingRow = row;
+                            if (minY == 0 || y < minY)
+                            {
+                                minY = y;
+                            }
 
+                            if (y > maxY)
+                            {
+                                maxY = y;
+                            }
+                            if (sum++ > (int)area * requiredAreaPart)
+                            {
+                                cuttingX = x;
+                            }
                         }
                     }
-                }
 
-                if (cuttingRow > 0)
-                {
-                    break;
-                }
+                    if (cuttingX > 0)
+                    {
+                        lines.Add(new Tuple<string, Point, Point>(pair.Item1, new Point(minY, cuttingX), new Point(maxY, cuttingX)));
+                        cuttingX = 0;
+                        sum = 0;
+                        break;
+                    }
 
-                minCol = 0;
-                maxCol = 0;
+                }
             }
 
             var color = new MCvScalar(0, 255, 0);
-            CvInvoke.Line(mat, new Point(minCol, cuttingRow), new Point(maxCol, cuttingRow), color, 10);
+            foreach (var line in lines)
+            {
+                CvInvoke.Line(mat, line.Item2, line.Item3, color, 10);
+            }
+            
             var newImage = mat.ToImage<Rgb, Byte>();
             var fileName = "/storage/emulated/0/Android/data/Camera2Basic.Camera2Basic/files/pic.jpg";
             newImage.ToBitmap().Save(fileName);
-            return fileName;
+             return fileName;
         }
     }
 
