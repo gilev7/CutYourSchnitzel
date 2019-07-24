@@ -1,9 +1,12 @@
 ﻿using Android.App;
 using Android.OS;
 using Android.Widget;
-using Java.IO;
 using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Net;
+using System.Net.Http;
+using System.Text;
 
 namespace Camera2Basic
 {
@@ -52,28 +55,45 @@ namespace Camera2Basic
 
         public void ChangeToImageView()
         {
-            //SendLocalMediaToDatabase();
-            //var percent = m_Seekbar.Progress;
-            HandlePicture();
+            var percent = m_Seekbar.Progress;
+            SendLocalMediaToDatabase(percent);
+            
+            //HandlePicture();
             StartActivity(typeof(ImageActivity));
         }
 
-        private async void SendLocalMediaToDatabase()
+        private async void SendLocalMediaToDatabase(int percent)
         {
             var filepath = "/storage/emulated/0/Android/data/Camera2Basic.Camera2Basic/files/pic.jpg";
-            var url = "https://cutyourschnitzel.azurewebsites.net/";
-            var webClient = new WebClientEx();
-            var boundary = "------------------------" + DateTime.Now.Ticks.ToString("x");
-            webClient.Headers.Add("Content-Type", "application/form-data; boundary=" + boundary);
+            // for python
+            //var url = "https://cutyourschnitzel.azurewebsites.net/";
+            // for c#
+            //var url = "http://schnitzelapp.azurewebsites.net/api/values";
 
-            webClient.Timeout = 900000;
 
-            byte[] resp = await webClient.UploadFileTaskAsync(url, filepath);
+            // provide read access to the file
+            FileStream fs = new FileStream(filepath, FileMode.Open, FileAccess.Read);
+            // Create a byte array of file stream length
+            byte[] ImageData = new byte[fs.Length];
+            //Read block of bytes from stream into the byte array
+            fs.Read(ImageData, 0, System.Convert.ToInt32(fs.Length));
+            //Close the File Stream
+            fs.Close();
+            string _base64String = Convert.ToBase64String(ImageData);
 
-            using (var fileOutputStream = new FileOutputStream(filepath))
-            {
-                await fileOutputStream.WriteAsync(resp);
+            
+            using (var client = new HttpClient())
+            {//
+                StringContent content = new StringContent("gilad", Encoding.ASCII, "application/x-www-form-urlencoded");
+                client.BaseAddress = new Uri("http://schnitzelapp.azurewebsites.net");
+
+                var result = client.PostAsync("/api/values", content).Result;
+                string resultContent = result.Content.ReadAsStringAsync().Result;
+
+                byte[] data = Convert.FromBase64String(resultContent);
+                File.WriteAllBytes(filepath, data);
             }
+            
         }
 
         public void HandlePicture()

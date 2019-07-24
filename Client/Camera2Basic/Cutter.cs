@@ -8,14 +8,15 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using CvInvoke = Emgu.CV.CvInvoke;
+using System.Runtime.InteropServices;
 
 namespace Camera2Basic
 {
     public static class Cutter
     {
         ///storage/emulated/0/Android/data/Camera2Basic.Camera2Basic/files/
-        //[DllImport("cvextern.dll", CharSet = CharSet.Unicode)]
-        //public static extern Mat Imread(string path, ImreadModes mode);
+        [DllImport("cvextern.dll")]
+        public static extern Mat Imread(string path, ImreadModes mode);
         public static void CutSchnitzelImage(string folderPath, IEnumerable<Tuple<string, double>> input = null)
         {
             var path = folderPath + "pic.jpg";
