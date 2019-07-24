@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Text;
 
 namespace CutSchnitzelAlgo
 {
@@ -42,9 +43,23 @@ namespace CutSchnitzelAlgo
                         var color = new MCvScalar(255, 0, 0);
                         var biggestContour = arrayList.OrderByDescending(x => x.Area).FirstOrDefault();
 
-                        if (biggestContour == null || biggestContour.Area < 1000)
+                        if (biggestContour == null || biggestContour.Area < 100000)
                         {
-                            //This is not a schnitzel
+                            StringBuilder imageComments = new StringBuilder();
+                            var thisIsNotSchnitzelMat = CvInvoke.Imread(path, ImreadModes.AnyColor);
+                            CvInvoke.CvtColor(thisIsNotSchnitzelMat, thisIsNotSchnitzelMat, ColorConversion.Bgr2Rgb);
+                            CvInvoke.PutText(
+                               thisIsNotSchnitzelMat,
+                               "This is not a schnitzel",
+                               new System.Drawing.Point(thisIsNotSchnitzelMat.Cols / 2, thisIsNotSchnitzelMat.Rows / 2),
+                               FontFace.HersheyPlain,
+                               2.0,
+                               new Rgb(0, 0, 255).MCvScalar, 3, LineType.Filled);
+
+                            var newImage = thisIsNotSchnitzelMat.ToImage<Rgb, Byte>();
+                            var fileName = @"c:\temp\thisIsNotSchnizel.png";
+                            newImage.ToBitmap().Save(fileName);
+                            return;
                         }
 
                         var mask = Mat.Zeros(imageHsvDest.Rows, imageHsvDest.Cols, DepthType.Cv8U, 3);
