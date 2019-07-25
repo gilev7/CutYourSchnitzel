@@ -2,6 +2,7 @@
 using Emgu.CV.CvEnum;
 using Emgu.CV.Structure;
 using Emgu.CV.Util;
+using Microsoft.WindowsAzure.Storage;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -14,14 +15,25 @@ namespace CutSchnitzelAlgo
 {
     public static class SchnitzelCutter
     {
-        public static byte[] CutSchnitzelImage(byte[] buf, IEnumerable<Tuple<string, double>> input = null)
+        public static string CutSchnitzelImage(string name, IEnumerable<Tuple<string, double>> input = null)
         {
+            if (input == null)
+            {
+                input = new List<Tuple<string, double>>()
+                {
+                    new Tuple<string, double>(string.Empty, 0.5),
+                    new Tuple<string, double>(string.Empty, 0.5),
+                };
+            }
 
-            var path = "pic.jpg";
-            File.WriteAllBytes(path, buf);
+            Bitmap bitMap = DownloadFromStorage(name);
+            var newName = "modified-" + name;
+
             try
             {
-                var mat = CvInvoke.Imread(path, ImreadModes.AnyColor);
+                var imageCV = new Image<Bgr, byte>(bitMap);
+                Mat mat = imageCV.Mat;
+
                 CvInvoke.CvtColor(mat, mat, ColorConversion.Bgr2Rgb);
                 CvInvoke.CvtColor(mat, mat, ColorConversion.Rgb2Hsv);
                 Image<Hsv, Byte> image = mat.ToImage<Hsv, Byte>();
@@ -47,33 +59,44 @@ namespace CutSchnitzelAlgo
                         var color = new MCvScalar(255, 0, 0);
                         var biggestContour = arrayList.OrderByDescending(x => x.Area).FirstOrDefault();
 
-                        if (biggestContour == null || biggestContour.Area < 100000)
+                        if (biggestContour == null || biggestContour.Contour == null || biggestContour.Area < 100000)
                         {
-                            StringBuilder imageComments = new StringBuilder();
-                            var thisIsNotSchnitzelMat = CvInvoke.Imread(path, ImreadModes.AnyColor);
-                            CvInvoke.CvtColor(thisIsNotSchnitzelMat, thisIsNotSchnitzelMat, ColorConversion.Bgr2Rgb);
-                            CvInvoke.PutText(
-                               thisIsNotSchnitzelMat,
-                               "This is not a schnitzel",
-                               new System.Drawing.Point(thisIsNotSchnitzelMat.Cols / 2, thisIsNotSchnitzelMat.Rows / 2),
-                               FontFace.HersheyPlain,
-                               2.0,
-                               new Rgb(0, 0, 255).MCvScalar, 3, LineType.Filled);
+                            try
+                            {
+                                StringBuilder imageComments = new StringBuilder();
+                                var imageCV2 = new Image<Bgr, byte>(bitMap);
+                                var thisIsNotSchnitzelMat = imageCV2.Mat;
+                                CvInvoke.CvtColor(thisIsNotSchnitzelMat, thisIsNotSchnitzelMat, ColorConversion.Bgr2Rgb);
+                                CvInvoke.PutText(
+                                   thisIsNotSchnitzelMat,
+                                   "This is not a Schnitzel",
+                                   new System.Drawing.Point(thisIsNotSchnitzelMat.Cols / 2, thisIsNotSchnitzelMat.Rows / 2),
+                                   FontFace.HersheyPlain,
+                                   2.0,
+                                   new Rgb(0, 0, 255).MCvScalar, 3, LineType.Filled);
 
-                            var newImage = thisIsNotSchnitzelMat.ToImage<Rgb, Byte>();
-                            //var fileName = @"c:\temp\thisIsNotSchnizel.png";
-                            //newImage.ToBitmap().Save(fileName);
-                            return newImage.ToJpegData();
+                                var newImage = thisIsNotSchnitzelMat.ToImage<Bgr, Byte>();
+                                //var fileName = @"c:\temp\thisIsNotSchnizel.png";
+                                //newImage.ToBitmap().Save(fileName);
+                                UploadToStorage(newImage.ToJpegData(), newName);
+                                return newName;
+                            }
+                            catch (Exception e)
+                            {
+                                return "error3: " + e.Message + "\n" + e.StackTrace;
+                            }
                         }
 
                         var mask = Mat.Zeros(imageHsvDest.Rows, imageHsvDest.Cols, DepthType.Cv8U, 3);
                         CvInvoke.DrawContours(mask, new VectorOfVectorOfPoint(biggestContour.Contour), 0, color, -1);
-                        var newPicPath = SchnitzelCutter.DividePicture(path, mask, biggestContour.Area, input.ToList());
-                        return newPicPath;
+                        var newByteImage = SchnitzelCutter.DividePicture(bitMap, mask, biggestContour.Area, input.ToList());
+                        UploadToStorage(newByteImage, newName);
+                        return newName;
                     }
                     catch (Exception e)
                     {
                         Console.WriteLine(e.Message);
+                        return "error1: " + e.Message +"\n" +  e.StackTrace;
                     }
                     finally
                     {
@@ -83,27 +106,18 @@ namespace CutSchnitzelAlgo
                     }
                 }
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                return "error2: " + e.Message;
                 // do nothing
             }
-
-            return buf;
         }
 
-        private static byte[] DividePicture(string path, Mat mask, double area, List<Tuple<string, double>> input)
+        private static byte[] DividePicture(Bitmap bitMap, Mat mask, double area, List<Tuple<string, double>> input)
         {
-            if (input == null)
-            {
-                input = new List<Tuple<string, double>>()
-                {
-                    new Tuple<string, double>(string.Empty, 0.5),
-                    new Tuple<string, double>(string.Empty, 0.5),
-                };
-            }
-
-            var mat = CvInvoke.Imread(path, ImreadModes.AnyColor);
-            CvInvoke.CvtColor(mat, mat, ColorConversion.Bgr2Rgb);
+            var imageCV = new Image<Bgr, byte>(bitMap);
+            var mat = imageCV.Mat;
+            //CvInvoke.CvtColor(mat, mat, ColorConversion.Bgr2Rgb);
             Image<Hsv, Byte> image = mask.ToImage<Hsv, Byte>();
             var points = image.Data;
             int sum = 0;
@@ -157,10 +171,42 @@ namespace CutSchnitzelAlgo
                 CvInvoke.Line(mat, line.Item2, line.Item3, color, 10);
             }
             
-            var newImage = mat.ToImage<Rgb, Byte>();
+            var newImage = mat.ToImage<Bgr, Byte>();
             //var fileName = "/storage/emulated/0/Android/data/Camera2Basic.Camera2Basic/files/pic.jpg";
             //newImage.ToBitmap().Save(fileName);
-             return newImage.ToJpegData();
+            return newImage.ToJpegData();
+        }
+
+        private static Bitmap DownloadFromStorage(string name)
+        {
+            var account = CloudStorageAccount.Parse("DefaultEndpointsProtocol=https;AccountName=t7qkustorengingiladtest2;AccountKey=/b8KfdN1R+mwaM4ixTfJcrL2erCc2XSTCYNk0ka7M0vSv/bmiFXmdJP+v7dNghB/JdRwXdJB6rSVWsITma+eXQ==;EndpointSuffix=core.windows.net");
+            var client = account.CreateCloudBlobClient();
+            var container = client.GetContainerReference("hackathon");
+            container.CreateIfNotExistsAsync().GetAwaiter().GetResult();
+            var blockBlob = container.GetBlockBlobReference(name);
+
+            using (var memoryStream = new MemoryStream())
+            {
+                blockBlob.DownloadToStream(memoryStream);
+
+                return (memoryStream == null) ? null : (Bitmap)Image.FromStream(memoryStream);
+            }
+        }
+
+        public static string UploadToStorage(byte[] data, string name)
+        {
+            var account = CloudStorageAccount.Parse("DefaultEndpointsProtocol=https;AccountName=t7qkustorengingiladtest2;AccountKey=/b8KfdN1R+mwaM4ixTfJcrL2erCc2XSTCYNk0ka7M0vSv/bmiFXmdJP+v7dNghB/JdRwXdJB6rSVWsITma+eXQ==;EndpointSuffix=core.windows.net");
+            var client = account.CreateCloudBlobClient();
+            var container = client.GetContainerReference("hackathon");
+            container.CreateIfNotExistsAsync().GetAwaiter().GetResult();
+            var blockBlob = container.GetBlockBlobReference(name);
+            
+            using (var stream = new MemoryStream(data, writable: false))
+            {
+                blockBlob.UploadFromStream(stream);
+            }
+
+            return name;
         }
     }
 

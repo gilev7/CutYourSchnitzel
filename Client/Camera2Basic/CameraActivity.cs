@@ -1,6 +1,10 @@
 ﻿using Android.App;
+using Android.Content;
+using Android.Graphics;
 using Android.OS;
+using Android.Provider;
 using Android.Widget;
+using Microsoft.WindowsAzure.Storage;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -56,13 +60,16 @@ namespace Camera2Basic
         public void ChangeToImageView()
         {
             var percent = m_Seekbar.Progress;
-            SendLocalMediaToDatabase(percent);
-            
+            string name = SendLocalMediaToDatabase(percent);
+
             //HandlePicture();
-            StartActivity(typeof(ImageActivity));
+            var intent = new Intent(this, typeof(ImageActivity));
+            intent.PutExtra("imageName", name);
+
+            StartActivity(intent);
         }
 
-        private async void SendLocalMediaToDatabase(int percent)
+        private string SendLocalMediaToDatabase(int percent)
         {
             var filepath = "/storage/emulated/0/Android/data/Camera2Basic.Camera2Basic/files/pic.jpg";
             // for python
@@ -83,17 +90,68 @@ namespace Camera2Basic
 
             
             using (var client = new HttpClient())
-            {//
-                StringContent content = new StringContent("gilad", Encoding.ASCII, "application/x-www-form-urlencoded");
-                client.BaseAddress = new Uri("http://schnitzelapp.azurewebsites.net");
+            {
+                Bitmap objBitmapImage = BitmapFactory.DecodeFile(filepath);
 
+               //var mBitMap = MediaStore.Images.Media.GetBitmap(ContentResolver, Android.Net.Uri.Parse(filepath));
+                byte[] bitmapData;
+                using (var stream = new MemoryStream())
+                {
+                    objBitmapImage.Compress(Bitmap.CompressFormat.Jpeg, 100, stream);
+                    bitmapData = stream.ToArray();
+                }
+                var inputStream = new MemoryStream(bitmapData);
+
+                var name = uploadToStorage(inputStream);
+
+                StringContent content = new StringContent("=" + name, Encoding.UTF8, "application/x-www-form-urlencoded");
+                client.BaseAddress = new Uri("http://schnitzelapp.azurewebsites.net");
+                var result = client.PostAsync("/api/values", content).Result;
+                string resultContent = result.Content.ReadAsStringAsync().Result;
+                var correctString = resultContent.Substring(1, resultContent.Length - 2);
+
+                downloadFromStorage("/storage/emulated/0/Android/data/Camera2Basic.Camera2Basic/files/" + correctString, correctString);
+
+                return correctString;
+                /**
                 var result = client.PostAsync("/api/values", content).Result;
                 string resultContent = result.Content.ReadAsStringAsync().Result;
 
-                byte[] data = Convert.FromBase64String(resultContent);
-                File.WriteAllBytes(filepath, data);
+                var correctString = resultContent.Substring(1, resultContent.Length - 2);
+                try
+                {
+                    byte[] data = Convert.FromBase64String(correctString);
+                    File.WriteAllBytes(filepath, data);
+                }
+                catch (Exception e)
+                {
+                    // do nothing
+                }
+                **/
             }
-            
+
+        }
+        public void downloadFromStorage(string path, string name)
+        {
+            var account = CloudStorageAccount.Parse("DefaultEndpointsProtocol=https;AccountName=t7qkustorengingiladtest2;AccountKey=/b8KfdN1R+mwaM4ixTfJcrL2erCc2XSTCYNk0ka7M0vSv/bmiFXmdJP+v7dNghB/JdRwXdJB6rSVWsITma+eXQ==;EndpointSuffix=core.windows.net");
+            var client = account.CreateCloudBlobClient();
+            var container = client.GetContainerReference("hackathon");
+            container.CreateIfNotExistsAsync().GetAwaiter().GetResult();
+            var blockBlob = container.GetBlockBlobReference(name);
+            blockBlob.DownloadToFileAsync(path, FileMode.OpenOrCreate).GetAwaiter().GetResult();
+        }
+
+        public string uploadToStorage(Stream stream)
+        {
+            var account = CloudStorageAccount.Parse("DefaultEndpointsProtocol=https;AccountName=t7qkustorengingiladtest2;AccountKey=/b8KfdN1R+mwaM4ixTfJcrL2erCc2XSTCYNk0ka7M0vSv/bmiFXmdJP+v7dNghB/JdRwXdJB6rSVWsITma+eXQ==;EndpointSuffix=core.windows.net");
+            var client = account.CreateCloudBlobClient();
+            var container = client.GetContainerReference("hackathon");
+            container.CreateIfNotExistsAsync().GetAwaiter().GetResult();
+            var name = Guid.NewGuid().ToString();
+            var name2 = $"{name}.jpg";
+            var blockBlob = container.GetBlockBlobReference(name2);
+            blockBlob.UploadFromStreamAsync(stream).GetAwaiter().GetResult();
+            return name2;
         }
 
         public void HandlePicture()

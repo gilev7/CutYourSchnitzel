@@ -20,8 +20,9 @@ namespace Camera2Basic
         {
             ActionBar.Hide();
             SetContentView(Resource.Layout.image_view);
+            string text = Intent.GetStringExtra("imageName");
 
-            var filepath = "/storage/emulated/0/Android/data/Camera2Basic.Camera2Basic/files/pic.jpg";
+            var filepath = "/storage/emulated/0/Android/data/Camera2Basic.Camera2Basic/files/" + text;
             Android.Net.Uri uri = Android.Net.Uri.FromFile(new Java.IO.File(filepath));
 
             var image = FindViewById<ImageView>(Resource.Id.pictureTaken);

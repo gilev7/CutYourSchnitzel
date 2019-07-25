@@ -27,8 +27,7 @@ namespace WebAppFramework.Controllers
         {
             try
             {
-                byte[] data = Convert.FromBase64String(value);
-                return Convert.ToBase64String(CutSchnitzelAlgo.SchnitzelCutter.CutSchnitzelImage(data));
+                return CutSchnitzelAlgo.SchnitzelCutter.CutSchnitzelImage(value);
             }
             catch (Exception e)
             {
