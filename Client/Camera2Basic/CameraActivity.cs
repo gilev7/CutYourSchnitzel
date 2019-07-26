@@ -76,24 +76,11 @@ namespace Camera2Basic
             //var url = "https://cutyourschnitzel.azurewebsites.net/";
             // for c#
             //var url = "http://schnitzelapp.azurewebsites.net/api/values";
-
-
-            // provide read access to the file
-            FileStream fs = new FileStream(filepath, FileMode.Open, FileAccess.Read);
-            // Create a byte array of file stream length
-            byte[] ImageData = new byte[fs.Length];
-            //Read block of bytes from stream into the byte array
-            fs.Read(ImageData, 0, System.Convert.ToInt32(fs.Length));
-            //Close the File Stream
-            fs.Close();
-            string _base64String = Convert.ToBase64String(ImageData);
-
             
             using (var client = new HttpClient())
             {
                 Bitmap objBitmapImage = BitmapFactory.DecodeFile(filepath);
 
-               //var mBitMap = MediaStore.Images.Media.GetBitmap(ContentResolver, Android.Net.Uri.Parse(filepath));
                 byte[] bitmapData;
                 using (var stream = new MemoryStream())
                 {
@@ -104,7 +91,7 @@ namespace Camera2Basic
 
                 var name = uploadToStorage(inputStream);
 
-                StringContent content = new StringContent("=" + name, Encoding.UTF8, "application/x-www-form-urlencoded");
+                StringContent content = new StringContent("=" + name + ";" + percent, Encoding.UTF8, "application/x-www-form-urlencoded");
                 client.BaseAddress = new Uri("http://schnitzelapp.azurewebsites.net");
                 var result = client.PostAsync("/api/values", content).Result;
                 string resultContent = result.Content.ReadAsStringAsync().Result;
@@ -113,21 +100,6 @@ namespace Camera2Basic
                 downloadFromStorage("/storage/emulated/0/Android/data/Camera2Basic.Camera2Basic/files/" + correctString, correctString);
 
                 return correctString;
-                /**
-                var result = client.PostAsync("/api/values", content).Result;
-                string resultContent = result.Content.ReadAsStringAsync().Result;
-
-                var correctString = resultContent.Substring(1, resultContent.Length - 2);
-                try
-                {
-                    byte[] data = Convert.FromBase64String(correctString);
-                    File.WriteAllBytes(filepath, data);
-                }
-                catch (Exception e)
-                {
-                    // do nothing
-                }
-                **/
             }
 
         }
